@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const cors = require("cors");
 
 const ConnectDB = require("./config/database");
 const categoryRouter = require("./routers/categoryRouter");
@@ -7,15 +8,19 @@ const adminRouter = require("./routers/adminRouter");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routers/authRouter");
 const productRouter = require("./routers/productRouter");
+const profileRouter = require("./routers/profileRouter");
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 app.use("/", categoryRouter);
 app.use("/", adminRouter);
 app.use("/", authRouter);
 app.use("/", productRouter);
+app.use("/", profileRouter);
+
 
 const startServer = async () => {
   try {
