@@ -1,5 +1,5 @@
 const express = require("express");
-const { addCategory, updateCategory } = require("../controllers/categoryControlles");
+const { addCategory, updateCategory, allCategory } = require("../controllers/categoryControlles");
 const upload = require("../middleware/mullter");
 const AdminAuth = require("../middleware/adminAuth");
 
@@ -13,6 +13,7 @@ categoryRouter.post(
 );
 
 categoryRouter.patch(`/adminauth/category/edit/:_id`,AdminAuth, upload.single("category_image"),updateCategory);
+categoryRouter.get("/category/all",allCategory)
  
 
 module.exports = categoryRouter;

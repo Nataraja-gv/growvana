@@ -18,7 +18,7 @@ const addCategory = async (req, res) => {
       return res.status(409).json({ message: "Category already exists." });
     }
 
-    let statusCode = false;
+    let statusCode = true;
     if (typeof status === "string") {
       if (status.toLowerCase() === "true") {
         statusCode = true;
@@ -72,10 +72,6 @@ const updateCategory = async (req, res) => {
         .json({ message: "category name and status required" });
     }
 
-    if (!req.file) {
-      return res.status(404).json({ message: "category image required" });
-    }
-
     let categoryImage;
     if (req.file) {
       categoryImage = req.file.location;
@@ -110,7 +106,7 @@ const updateCategory = async (req, res) => {
     });
     const response = await categoryData.save();
     res.status(200).json({
-      message: `${category_name} updated succesfukky`,
+      message: `${category_name} updated succesfully`,
       data: response,
     });
   } catch (error) {
@@ -118,4 +114,34 @@ const updateCategory = async (req, res) => {
   }
 };
 
-module.exports = { addCategory, updateCategory };
+const allCategory = async (req, res) => {
+  try {
+    let limit = parseInt(req.query.limit || 3);
+    let page = parseInt(req.query.page || 1);
+
+    limit = limit > 5 ? 5 : limit;
+    skip = (page - 1) * limit;
+
+    const categoryData = await Category.find()
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit);
+
+    const total_records = await Category.find();
+    const totalPages = Math.ceil(total_records.length / limit);
+    res.status(200).json({
+      message: `all category DEtails`,
+      currectPage: page,
+      recordPerPage: limit,
+      totalRecords: total_records.length,
+      totalPages,
+      data: categoryData,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { addCategory, updateCategory, allCategory };
