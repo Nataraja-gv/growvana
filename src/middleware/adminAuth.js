@@ -1,4 +1,5 @@
 const JWT = require("jsonwebtoken");
+const User = require("../models/userModel");
 
 const AdminAuth = async (req, res, next) => {
   try {
@@ -10,6 +11,9 @@ const AdminAuth = async (req, res, next) => {
       admintoken,
       process.env.JWT_SECRET_kEY
     );
+    const { _id } = decodedEmail;
+    const adminUser = await User.findById(_id).select("name email");
+    req.admin = adminUser;
 
     next();
   } catch (error) {
