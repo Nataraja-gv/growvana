@@ -53,7 +53,7 @@ const ProductAddControllers = async (req, res) => {
     const existProduct = await Product.findOne({ product_name });
     if (existProduct) {
       return res.status(400).json({
-        message: `${existProduct?.product_name}product all ready exist`,
+        message: `${existProduct?.product_name} product already exists`,
       });
     }
 
@@ -69,9 +69,19 @@ const ProductAddControllers = async (req, res) => {
         .json({ message: "Offer price less than Product Price" });
     }
 
-    if (!validColor.includes(color_options)) {
-      return res.status(400).json({ message: "color options in valid" });
-    }
+    // if (!validColor.includes(color_options)) {
+    //   return res.status(400).json({ message: "color options in valid" });
+    // }
+
+    // const colorOptions = color_options.map((color) => color.toLowerCase());
+
+    // const allColorsValid = colorOptions.every((color) =>
+    //   validColor.includes(color)
+    // );
+
+    // if (!allColorsValid) {
+    //   return res.status(400).json({ message: "color options invalid" });
+    // }
 
     const images = req.files.map((item) => ({
       image_link: item.location,
@@ -101,8 +111,27 @@ const ProductAddControllers = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const allProducts = await Product.find().populate("category");
-    res.status(200).json({ message: "all product Data", data: allProducts });
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 5;
+
+    limit = limit > 5 ? 5 : limit;
+    skip = (page - 1) * limit;
+
+    const allProducts = await Product.find()
+      .populate("category")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+    res?.status(200)?.json({
+      message: "all product Data",
+      data: allProducts,
+      totalProducts,
+      totalPages,
+      currentPage: page,
+      recordPerPage: limit,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -134,6 +163,7 @@ const editProductControllers = async (req, res) => {
       "inStock",
       "color_options",
       "inStock",
+      "product_images",
     ];
 
     const validColor = ["orange", "black", "white", "green"];
@@ -170,9 +200,10 @@ const editProductControllers = async (req, res) => {
       } else if (Array.isArray(product_images)) {
         existingImages = product_images;
       }
-      updateImages = existingImages.map((item) => {
-        image_link = item;
-      });
+
+      updateImages = existingImages?.map((item) => ({
+        image_link: item,
+      }));
     }
 
     if (req.files && req.files.length > 0) {
@@ -199,8 +230,14 @@ const editProductControllers = async (req, res) => {
         .json({ message: "Offer price less than Product Price" });
     }
 
-    if (!validColor.includes(color_options)) {
-      return res.status(400).json({ message: "color options in valid" });
+    const colorOptions = color_options.map((color) => color.toLowerCase());
+
+    const allColorsValid = colorOptions.every((color) =>
+      validColor.includes(color)
+    );
+
+    if (!allColorsValid) {
+      return res.status(400).json({ message: "color options invalid" });
     }
 
     let inStockCode = false;
@@ -217,7 +254,7 @@ const editProductControllers = async (req, res) => {
     } else if (typeof inStock === "boolean") {
       inStockCode = inStock;
     } else if (inStock !== undefined) {
-      return res.status(400).json({ message: "Invalid inStock value." });
+      return res?.status(400).json({ message: "Invalid inStock value." });
     }
 
     const data = {
@@ -227,7 +264,7 @@ const editProductControllers = async (req, res) => {
       offer_price,
       description,
       category,
-      color_options,
+      color_options: colorOptions,
       product_images: updateImages,
       inStock: inStockCode,
     };
@@ -243,7 +280,7 @@ const editProductControllers = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    res.inStock(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

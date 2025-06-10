@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+ 
 
 const productSchema = new mongoose.Schema(
   {
@@ -36,16 +37,22 @@ const productSchema = new mongoose.Schema(
       default: true,
     },
     color_options: {
-      type: String,
-      enum: {
-        values: ["orange", "black", "white", "green"],
-        message: "{VALUE} is not supported",
+      type: [String],
+      required: true,
+      validate:{
+        validator: function(value) {
+          const validColors =["orange", "black", "white", "green"];
+          return value.every(color => validColors.includes(color));
+        },
+        message: "Invalid color option"
       },
+      default: ["white"],
     },
   },
   { timestamps: true }
 );
 
+ 
 const Product = mongoose.model("products", productSchema);
 
 module.exports = Product;
