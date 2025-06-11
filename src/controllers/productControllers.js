@@ -230,15 +230,15 @@ const editProductControllers = async (req, res) => {
         .json({ message: "Offer price less than Product Price" });
     }
 
-    const colorOptions = color_options.map((color) => color.toLowerCase());
+    // const colorOptions = color_options?.map((color) => color.toLowerCase());
 
-    const allColorsValid = colorOptions.every((color) =>
-      validColor.includes(color)
-    );
+    // const allColorsValid = colorOptions.every((color) =>
+    //   validColor.includes(color)
+    // );
 
-    if (!allColorsValid) {
-      return res.status(400).json({ message: "color options invalid" });
-    }
+    // if (!allColorsValid) {
+    //   return res.status(400).json({ message: "color options invalid" });
+    // }
 
     let inStockCode = false;
     if (typeof inStock === "string") {
@@ -264,7 +264,7 @@ const editProductControllers = async (req, res) => {
       offer_price,
       description,
       category,
-      color_options: colorOptions,
+      color_options ,
       product_images: updateImages,
       inStock: inStockCode,
     };
