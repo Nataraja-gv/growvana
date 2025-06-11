@@ -112,9 +112,9 @@ const ProductAddControllers = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.limit) || 5;
+    let limit = parseInt(req.query.limit) || 15;
 
-    limit = limit > 5 ? 5 : limit;
+    limit = limit > 15 ? 15 : limit;
     skip = (page - 1) * limit;
 
     const allProducts = await Product.find()
@@ -131,6 +131,25 @@ const getAllProducts = async (req, res) => {
       totalPages,
       currentPage: page,
       recordPerPage: limit,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getProductById = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const ProductData = await Product.findById({ _id: productId }).populate(
+      "category"
+    );
+    if (!ProductData) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res?.status(200)?.json({
+      message: "Product Data",
+      data: ProductData,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -264,7 +283,7 @@ const editProductControllers = async (req, res) => {
       offer_price,
       description,
       category,
-      color_options ,
+      color_options,
       product_images: updateImages,
       inStock: inStockCode,
     };
@@ -305,4 +324,5 @@ module.exports = {
   getAllProducts,
   editProductControllers,
   deleteProductControllers,
+  getProductById
 };

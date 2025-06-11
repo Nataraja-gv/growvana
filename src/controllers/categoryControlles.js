@@ -116,10 +116,10 @@ const updateCategory = async (req, res) => {
 
 const allCategory = async (req, res) => {
   try {
-    let limit = parseInt(req.query.limit || 3);
+    let limit = parseInt(req.query.limit || 15);
     let page = parseInt(req.query.page || 1);
 
-    limit = limit > 5 ? 5 : limit;
+    limit = limit > 15 ? 15 : limit;
     skip = (page - 1) * limit;
 
     const categoryData = await Category.find()
