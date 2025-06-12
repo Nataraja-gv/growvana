@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
- 
 
 const cartItemSchema = new mongoose.Schema({
-  item: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "products",
     required: true,
@@ -14,6 +13,10 @@ const cartItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1,
+  },
+  colorType: {
+    type: String,
+    required: true,
   },
 });
 

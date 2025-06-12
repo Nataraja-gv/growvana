@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routers/authRouter");
 const productRouter = require("./routers/productRouter");
 const profileRouter = require("./routers/profileRouter");
+const cartRouter = require("./routers/cartRouter");
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,7 @@ app.use("/", adminRouter);
 app.use("/", authRouter);
 app.use("/", productRouter);
 app.use("/", profileRouter);
+app.use("/", cartRouter);
 
 const startServer = async () => {
   try {
