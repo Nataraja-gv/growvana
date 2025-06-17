@@ -16,6 +16,10 @@ const placeTheOrder = async (req, res) => {
       (item) => item._id.toString() === address
     );
 
+    const selectedAddress = allAddresses.find(
+      (item) => item._id.toString() === address
+    );
+
     if (!isAddressValid) {
       return res.status(400).json({ message: "Invalid address" });
     }
@@ -60,13 +64,15 @@ const placeTheOrder = async (req, res) => {
 
     const order = new orderModel({
       userId,
-      address,
+
+      address: selectedAddress,
       items: items.map((item) => ({
         product: item.product,
         quantity: item.quantity,
       })),
       totalAmount,
       paymentMethod,
+       
     });
 
     const response = await order.save();
@@ -91,7 +97,7 @@ const getAllOrders = async (req, res) => {
     const existAllOrders = await orderModel
       .find()
       .populate("items.product")
-      .populate("address")
+      .populate("address.addressId")
       .populate("userId")
       .sort({ createdAt: -1 });
     res.status(200).json({ message: " all orders List", data: existAllOrders });
@@ -100,4 +106,37 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-module.exports = { placeTheOrder, getAllOrders };
+const updateDelivaryStatus = async (req, res) => {
+  try {
+    const { orderStatus, orderId ,paymentStatus} = req.body;
+    const validOrderStatus = [
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    if (!validOrderStatus.includes(orderStatus)) {
+      return res
+        .status(400)
+        .json({ message: `invalid ${orderStatus} order status type` });
+    }
+
+    const orderDetails = await orderModel.findById({ _id: orderId });
+    if (!orderDetails) {
+      return res.status(400).json({ message: "order Details not found" });
+    }
+
+    if(paymentStatus){
+      orderDetails.paymentStatus=paymentStatus
+    }
+
+    orderDetails.orderStatus = orderStatus;
+    await orderDetails.save();
+
+    res.status(200).json({ message: "order status updated" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+module.exports = { placeTheOrder, getAllOrders, updateDelivaryStatus };

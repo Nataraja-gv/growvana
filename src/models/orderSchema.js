@@ -8,8 +8,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "address",
+      type: Object,
       required: true,
     },
     items: [

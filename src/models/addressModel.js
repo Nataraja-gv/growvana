@@ -43,6 +43,6 @@ const addressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const AddressModel = mongoose.model("address", addressSchema);
+const AddressModel = mongoose.model("userAddress", addressSchema);
 
 module.exports = AddressModel;
