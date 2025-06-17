@@ -1,35 +1,55 @@
 const AddressModel = require("../models/addressModel");
 const orderModel = require("../models/orderSchema");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 
 const placeTheOrder = async (req, res) => {
   try {
     const userId = req.user._id;
     const { address, items, paymentMethod } = req.body;
 
-    if (address & !address) {
-      return res.status(400).json({ message: "addres is required" });
-    }
     const existAddress = await AddressModel.find({ userId });
-     const isAddressValid = existAddress.addresses.some((item)=>item._id.toString()===address)
 
-     if (!isAddressValid) {
+    const allAddresses = existAddress.flatMap((doc) => doc.addresses);
+
+    const isAddressValid = allAddresses.some(
+      (item) => item._id.toString() === address
+    );
+
+    if (!isAddressValid) {
       return res.status(400).json({ message: "Invalid address" });
     }
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "Items are required" });
     }
 
-    let totalAmount = 0;
+    // Step 1: Combine quantities for the same product
+    const quantityMap = {};
 
     for (const item of items) {
-      const product = await Product.findById({ _id: item?.product });
+      const productId = item.product;
+      const quantity = Number(item.quantity);
+
+      if (quantityMap[productId]) {
+        quantityMap[productId] += quantity;
+      } else {
+        quantityMap[productId] = quantity;
+      }
+    }
+
+    // Step 2: Fetch products and calculate total
+    let totalAmount = 0;
+
+    for (const productId in quantityMap) {
+      const product = await Product.findById(productId);
+
       if (!product) {
         return res
           .status(400)
-          .json({ message: `product with id ${item?.product} not found` });
+          .json({ message: `Product with id ${productId} not found` });
       }
-      totalAmount += product.offer_price * product.quantity;
+
+      totalAmount += Number(product.offer_price) * quantityMap[productId];
     }
 
     const validPaymentMethod = ["COD", "Online"];
@@ -55,10 +75,29 @@ const placeTheOrder = async (req, res) => {
       return res.status(500).json({ message: "Failed to place order" });
     }
 
+    const clearOrders = await User.findById({ _id: userId });
+
+    clearOrders.cartItems = [];
+    await clearOrders.save();
+
     res.status(200).json({ message: "Order placed successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-module.exports = { placeTheOrder };
+const getAllOrders = async (req, res) => {
+  try {
+    const existAllOrders = await orderModel
+      .find()
+      .populate("items.product")
+      .populate("address")
+      .populate("userId")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ message: " all orders List", data: existAllOrders });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports = { placeTheOrder, getAllOrders };
