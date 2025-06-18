@@ -6,7 +6,7 @@ const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
 
-const RazorPayController = async (req, res) => {
+const RazorPayOrderController = async (req, res) => {
   try {
     const { address, items, paymentMethod } = req.body;
     const userId = req.user._id;
@@ -118,4 +118,4 @@ const RazorPayVerify = async (req, res) => {
   }
 };
 
-module.exports = { RazorPayController, RazorPayVerify };
+module.exports = { RazorPayOrderController, RazorPayVerify };

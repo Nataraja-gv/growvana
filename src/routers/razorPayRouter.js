@@ -1,6 +1,7 @@
 const express = require("express");
 const userAuth = require("../middleware/userauth");
-const { RazorPayController, RazorPayVerify } = require("../controllers/razorpayControllers");
+const { RazorPayOrderController, RazorPayVerify } = require("../controllers/razorpayControllers");
+ 
  
 
 const razorPayrouter = express.Router();
@@ -8,7 +9,7 @@ const razorPayrouter = express.Router();
 razorPayrouter.post(
   "/user/order/razorpay/create",
   userAuth,
-  RazorPayController
+  RazorPayOrderController
 );
 razorPayrouter.post("/payment/webhook",RazorPayVerify)
 
