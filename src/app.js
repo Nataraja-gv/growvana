@@ -24,6 +24,7 @@ app.use(
   })
 );
 
+
 app.use("/", categoryRouter);
 app.use("/", adminRouter);
 app.use("/", authRouter);
