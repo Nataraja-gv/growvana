@@ -3,7 +3,7 @@ const userAuth = require("../middleware/userauth");
 const {
   RazorPayOrderController,
   RazorPayVerify,
-} = require("../controllers/razorpayControllers");
+} = require("../controllers/paymentcontrollers.js");
 const razorPayRouter = express.Router();
 
 razorPayRouter.post(
