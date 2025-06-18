@@ -12,6 +12,7 @@ const profileRouter = require("./routers/profileRouter");
 const cartRouter = require("./routers/cartRouter");
 const addressRouter = require("./routers/addressRouter");
 const orderRouter = require("./routers/orderRouter");
+const razorPayrouter = require("./routers/razorPayRouter");
 
 const app = express();
 app.use(express.json());
@@ -31,6 +32,7 @@ app.use("/", profileRouter);
 app.use("/", cartRouter);
 app.use("/", addressRouter);
 app.use("/", orderRouter);
+app.use("/", razorPayrouter);
 
 const startServer = async () => {
   try {
