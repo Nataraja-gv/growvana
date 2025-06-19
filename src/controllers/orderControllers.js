@@ -64,7 +64,6 @@ const placeTheOrder = async (req, res) => {
 
     const order = new orderModel({
       userId,
-
       address: selectedAddress,
       items: items.map((item) => ({
         product: item.product,
@@ -72,7 +71,6 @@ const placeTheOrder = async (req, res) => {
       })),
       totalAmount,
       paymentMethod,
-       
     });
 
     const response = await order.save();
@@ -108,12 +106,13 @@ const getAllOrders = async (req, res) => {
 
 const updateDelivaryStatus = async (req, res) => {
   try {
-    const { orderStatus, orderId ,paymentStatus} = req.body;
+    const { orderStatus, orderId, paymentStatus } = req.body;
     const validOrderStatus = [
       "Processing",
       "Shipped",
       "Delivered",
       "Cancelled",
+      "Out for Delivery"
     ];
 
     if (!validOrderStatus.includes(orderStatus)) {
@@ -127,8 +126,8 @@ const updateDelivaryStatus = async (req, res) => {
       return res.status(400).json({ message: "order Details not found" });
     }
 
-    if(paymentStatus){
-      orderDetails.paymentStatus=paymentStatus
+    if (paymentStatus) {
+      orderDetails.paymentStatus = paymentStatus;
     }
 
     orderDetails.orderStatus = orderStatus;
@@ -139,4 +138,27 @@ const updateDelivaryStatus = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-module.exports = { placeTheOrder, getAllOrders, updateDelivaryStatus };
+
+const allOrdersByUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const orderList = await orderModel
+      .find({ userId: userId })
+      .select(
+        "address items totalAmount paymentMethod paymentStatus orderStatus createdAt"
+      )
+      .populate("items.product")
+      .sort({createdAt:-1});
+    console.log(orderList);
+    res.status(200).json({ message: "user order list", data: orderList });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+module.exports = {
+  placeTheOrder,
+  getAllOrders,
+  updateDelivaryStatus,
+  allOrdersByUser,
+};
