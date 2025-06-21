@@ -319,10 +319,37 @@ const deleteProductControllers = async (req, res) => {
   }
 };
 
+const categoryByProduct = async (req, res) => {
+  try {
+    const { categoryId } = req.query;
+
+    const ProductList = await Product.find({ category: categoryId }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json({ message: "category by product", data: ProductList });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const filterProduct = async (req, res) => {
+  try {
+    const {filter} = req.query;
+    const filterData = await Product.find({
+      product_name: { $regex: filter, $options: "i" },
+    });
+    res.status(200).json({ message: "search products", data: filterData });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   ProductAddControllers,
   getAllProducts,
   editProductControllers,
   deleteProductControllers,
-  getProductById
+  getProductById,
+  categoryByProduct,
+  filterProduct,
 };

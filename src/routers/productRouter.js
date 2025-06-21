@@ -6,6 +6,8 @@ const {
   editProductControllers,
   deleteProductControllers,
   getProductById,
+  categoryByProduct,
+  filterProduct,
 } = require("../controllers/productControllers");
 const AdminAuth = require("../middleware/adminAuth");
 const upload = require("../middleware/mullter");
@@ -28,13 +30,13 @@ productRouter.patch(
 
 productRouter.get("/allproducts/all", getAllProducts);
 productRouter.get("/product/:productId", getProductById);
+productRouter.get("/product/category/all", categoryByProduct);
+productRouter.get("/products/filter", filterProduct);
 
 productRouter.delete(
   "/adminauth/product/delete/:productId",
   AdminAuth,
   deleteProductControllers
 );
-
-
 
 module.exports = productRouter;

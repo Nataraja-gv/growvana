@@ -1,6 +1,7 @@
 const AddressModel = require("../models/addressModel");
 const orderModel = require("../models/orderSchema");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 const RazorPayInstance = require("../utils/razorPayInstance");
 const {
   validateWebhookSignature,
@@ -91,6 +92,11 @@ const RazorPayOrderController = async (req, res) => {
       notes: razorPayResponse.notes,
     });
     const data = await order.save();
+     await order.save();
+    const clearOrders = await User.findById({ _id: userId });
+
+    clearOrders.cartItems = [];
+    await clearOrders.save();
     res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
   } catch (error) {
     res.status(400).json({ message: error.message });
