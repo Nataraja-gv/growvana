@@ -2,10 +2,12 @@ const AddressModel = require("../models/addressModel");
 const orderModel = require("../models/orderSchema");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
+const { sendOrderMail, sendOrderStatusEmail } = require("./sendOrderEmail");
 
 const placeTheOrder = async (req, res) => {
   try {
     const userId = req.user._id;
+    const userEmail = req.user.email;
     const { address, items, paymentMethod } = req.body;
 
     const existAddress = await AddressModel.find({ userId });
@@ -74,7 +76,7 @@ const placeTheOrder = async (req, res) => {
     });
 
     const response = await order.save();
-
+    console.log(response);
     if (!response) {
       return res.status(500).json({ message: "Failed to place order" });
     }
@@ -83,6 +85,8 @@ const placeTheOrder = async (req, res) => {
 
     clearOrders.cartItems = [];
     await clearOrders.save();
+
+    await sendOrderMail(userEmail, order.totalAmount, items?.length);
 
     res.status(200).json({ message: "Order placed successfully" });
   } catch (error) {
@@ -106,13 +110,13 @@ const getAllOrders = async (req, res) => {
 
 const updateDelivaryStatus = async (req, res) => {
   try {
-    const { orderStatus, orderId, paymentStatus } = req.body;
+    const { orderStatus, orderId, paymentStatus, userId } = req.body;
     const validOrderStatus = [
       "Processing",
       "Shipped",
       "Delivered",
       "Cancelled",
-      "Out for Delivery"
+      "Out for Delivery",
     ];
 
     if (!validOrderStatus.includes(orderStatus)) {
@@ -121,6 +125,11 @@ const updateDelivaryStatus = async (req, res) => {
         .json({ message: `invalid ${orderStatus} order status type` });
     }
 
+    const userDetails = await User.findById({ _id: userId });
+    if(!userDetails){
+      return res.status(400).json({ message: "user Details not found" });
+
+    }
     const orderDetails = await orderModel.findById({ _id: orderId });
     if (!orderDetails) {
       return res.status(400).json({ message: "order Details not found" });
@@ -132,6 +141,7 @@ const updateDelivaryStatus = async (req, res) => {
 
     orderDetails.orderStatus = orderStatus;
     await orderDetails.save();
+    await sendOrderStatusEmail(userDetails.email, orderStatus);
 
     res.status(200).json({ message: "order status updated" });
   } catch (error) {
@@ -149,7 +159,7 @@ const allOrdersByUser = async (req, res) => {
         "address items totalAmount paymentMethod paymentStatus orderStatus createdAt"
       )
       .populate("items.product")
-      .sort({createdAt:-1});
+      .sort({ createdAt: -1 });
     console.log(orderList);
     res.status(200).json({ message: "user order list", data: orderList });
   } catch (error) {

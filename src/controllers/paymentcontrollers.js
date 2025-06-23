@@ -6,6 +6,7 @@ const RazorPayInstance = require("../utils/razorPayInstance");
 const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
+const {sendOrderMail} = require("./sendOrderEmail");
 
 const RazorPayOrderController = async (req, res) => {
   try {
@@ -92,11 +93,13 @@ const RazorPayOrderController = async (req, res) => {
       notes: razorPayResponse.notes,
     });
     const data = await order.save();
-     await order.save();
+    await order.save();
     const clearOrders = await User.findById({ _id: userId });
 
     clearOrders.cartItems = [];
     await clearOrders.save();
+    await sendOrderMail(user.email, order.totalAmount, items?.length);
+
     res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -129,6 +132,7 @@ const RazorPayVerify = async (req, res) => {
     order.razorpayDetails.signature = webhookSignature;
 
     await order.save();
+
     res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
