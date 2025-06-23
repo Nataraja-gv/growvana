@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+require("./controllers/dailyPromoEmail")
 const cors = require("cors");
 
 const ConnectDB = require("./config/database");
