@@ -1,6 +1,8 @@
 const express = require("express");
 require("dotenv").config();
-require("./controllers/dailyPromoEmail")
+require("./controllers/dailyPromoEmail");
+const deactivateExpiredSubscriptions = require("./utils/deactivateExpiredSubscriptions");
+deactivateExpiredSubscriptions();
 const cors = require("cors");
 
 const ConnectDB = require("./config/database");
@@ -14,7 +16,7 @@ const cartRouter = require("./routers/cartRouter");
 const addressRouter = require("./routers/addressRouter");
 const orderRouter = require("./routers/orderRouter");
 const razorPayRouter = require("./routers/razorRouter");
- 
+const { SubscriptionRouter } = require("./routers/subScriptionRouter");
 
 const app = express();
 app.use(express.json());
@@ -35,6 +37,7 @@ app.use("/", cartRouter);
 app.use("/", addressRouter);
 app.use("/", orderRouter);
 app.use("/", razorPayRouter);
+app.use("/", SubscriptionRouter);
 
 const startServer = async () => {
   try {

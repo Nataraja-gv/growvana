@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema(
       },
     },
     cartItems: [cartItemSchema],
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

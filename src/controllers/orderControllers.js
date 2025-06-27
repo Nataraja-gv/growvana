@@ -76,7 +76,7 @@ const placeTheOrder = async (req, res) => {
     });
 
     const response = await order.save();
-    console.log(response);
+
     if (!response) {
       return res.status(500).json({ message: "Failed to place order" });
     }
@@ -86,7 +86,7 @@ const placeTheOrder = async (req, res) => {
     clearOrders.cartItems = [];
     await clearOrders.save();
 
-    await sendOrderMail(userEmail, order.totalAmount, items?.length);
+    await sendOrderMail(userEmail, order.totalAmount, items);
 
     res.status(200).json({ message: "Order placed successfully" });
   } catch (error) {
@@ -126,9 +126,8 @@ const updateDelivaryStatus = async (req, res) => {
     }
 
     const userDetails = await User.findById({ _id: userId });
-    if(!userDetails){
+    if (!userDetails) {
       return res.status(400).json({ message: "user Details not found" });
-
     }
     const orderDetails = await orderModel.findById({ _id: orderId });
     if (!orderDetails) {

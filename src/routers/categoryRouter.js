@@ -12,7 +12,7 @@ categoryRouter.post(
   addCategory
 );
 
-categoryRouter.patch(`/adminauth/category/edit/:_id`,AdminAuth, upload.single("category_image"),updateCategory);
+categoryRouter.patch(`/adminauth/category/edit/:_id`, AdminAuth, upload.single("category_image"),updateCategory);
 categoryRouter.get("/category/all",allCategory)
  
 

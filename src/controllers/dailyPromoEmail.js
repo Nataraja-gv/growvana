@@ -52,7 +52,7 @@ const sendDailyPromo = async () => {
   }
 };
 
-cron.schedule("0 6 * * *", () => {
+cron.schedule("38 18 * * *", () => {
   sendDailyPromo();
 });
 

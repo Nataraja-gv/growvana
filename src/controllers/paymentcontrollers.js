@@ -6,7 +6,9 @@ const RazorPayInstance = require("../utils/razorPayInstance");
 const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
-const {sendOrderMail} = require("./sendOrderEmail");
+const { sendOrderMail } = require("./sendOrderEmail");
+const { SubScription_PLAN_CONFIG } = require("../utils/subscription");
+const SubScription = require("../models/subscriptionmodel");
 
 const RazorPayOrderController = async (req, res) => {
   try {
@@ -139,4 +141,116 @@ const RazorPayVerify = async (req, res) => {
   }
 };
 
-module.exports = { RazorPayOrderController, RazorPayVerify };
+const RazorPayPremiumController = async (req, res) => {
+  try {
+    const { planType } = req.query;
+    const userId = req.user._id;
+    const user = req.user;
+    if (!planType) {
+      return res.status(400).json({ message: " plan type required" });
+    }
+    const validPlantype = ["monthlyPlan", "yearPlan", "quarterlyPlan"];
+
+    if (!validPlantype.includes(planType)) {
+      return res
+        .status(400)
+        .json({ message: `${planType} is an invalid plan type.` });
+    }
+
+    const existingPlan = await SubScription.findOne({
+      user: userId,
+      active: true,
+      endDate: { $gt: new Date() },
+    });
+
+    if (existingPlan) {
+      return res
+        .status(400)
+        .json({ message: "User already has an active subscription." });
+    }
+
+    const config = SubScription_PLAN_CONFIG[planType];
+    if (!config) {
+      return res.status(400).json({ message: "Plan configuration not found." });
+    }
+
+    const totalAmount = config?.PlanAmount;
+    const options = {
+      amount: totalAmount * 100,
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+      notes: {
+        userName: user?.name,
+        email: user?.email,
+      },
+    };
+
+    const razorPayResponse = await RazorPayInstance.orders.create(options);
+
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + config.durationInDays);
+
+    const newSubScription = new SubScription({
+      user: userId,
+      planType,
+      planDetails: {
+        PlanAmount: razorPayResponse.amount / 100,
+        durationInDays: config.durationInDays,
+      },
+      startDate,
+      endDate,
+      razorpayDetails: {
+        orderId: razorPayResponse.id,
+      },
+      active: false,
+    });
+
+    await newSubScription.save();
+
+    res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const RazorPayPremiumVerify = async (req, res) => {
+  try {
+    const webhookSignature = req.get("X-Razorpay-Signature");
+    const validWebhookSignature = validateWebhookSignature(
+      JSON.stringify(req.body),
+      webhookSignature,
+      process.env.Razorpay_webhookSecret
+    );
+    if (!validWebhookSignature) {
+      return res.status(400).json({ message: "invalid webhook signature" });
+    }
+
+    const paymentDetails = req.body.payload.payment.entity;
+
+    const order = await SubScription.findOne({
+      "razorpayDetails.orderId": paymentDetails?.order_id,
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order.active = paymentDetails?.status === "captured" ? true : false;
+    order.razorpayDetails.paymentId = paymentDetails.id;
+    order.razorpayDetails.signature = webhookSignature;
+
+    await order.save();
+    // const user = await User.findById({ _id: userId });
+    // user.isPremium = newSubScription.planType ? true : false;
+    // await user.save();
+
+    res.status(200).json({ message: "webhook received successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+module.exports = {
+  RazorPayOrderController,
+  RazorPayVerify,
+  RazorPayPremiumController,
+  RazorPayPremiumVerify,
+};
