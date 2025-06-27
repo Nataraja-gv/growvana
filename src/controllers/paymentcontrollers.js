@@ -228,16 +228,15 @@ const RazorPayPremiumVerify = async (req, res) => {
     }
 
     const paymentDetails = req.body.payload.payment.entity;
-    console.log(paymentDetails, "paymentDetails ");
 
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(order, "order");
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    order.active = paymentDetails?.status === "captured" ? true : false;
+    order.active = paymentDetails?.status  ;
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
 
