@@ -16,7 +16,8 @@ const cartRouter = require("./routers/cartRouter");
 const addressRouter = require("./routers/addressRouter");
 const orderRouter = require("./routers/orderRouter");
 const razorPayRouter = require("./routers/razorRouter");
-const { SubscriptionRouter } = require("./routers/subScriptionRouter");
+const SubscriptionRouter = require("./routers/subScriptionRouter");
+ 
 
 const app = express();
 app.use(express.json());

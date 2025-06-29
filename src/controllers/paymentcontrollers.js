@@ -224,6 +224,8 @@ const RazorPayPremiumVerify = async (req, res) => {
       process.env.Razorpay_webhookSecret
     );
 
+    console.log(req.body)
+
     if (!validWebhookSignature) {
       return res.status(400).json({ message: "invalid webhook signature" });
     }
