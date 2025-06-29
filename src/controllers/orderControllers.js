@@ -159,7 +159,7 @@ const allOrdersByUser = async (req, res) => {
       )
       .populate("items.product")
       .sort({ createdAt: -1 });
-    console.log(orderList);
+
     res.status(200).json({ message: "user order list", data: orderList });
   } catch (error) {
     res.status(400).json({ message: error.message });
