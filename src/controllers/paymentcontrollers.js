@@ -121,10 +121,13 @@ const RazorPayVerify = async (req, res) => {
     }
 
     const paymentDetails = req.body.payload.payment.entity;
+    console.log(paymentDetails,"paymentDetails")
 
     const order = await orderModel.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
+
+     console.log(order,"order")
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
