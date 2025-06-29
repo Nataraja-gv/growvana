@@ -25,4 +25,4 @@ SubscriptionRouter.get(
 
 SubscriptionRouter.post("/payment/webhook", RazorPayPremiumVerify);
 
-module.exports =  SubscriptionRouter;
+module.exports = SubscriptionRouter;
