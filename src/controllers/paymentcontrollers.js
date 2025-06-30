@@ -130,7 +130,7 @@ const RazorPayVerify = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
     order.paymentStatus =
-      paymentDetails?.status === "captured" ? "Pai66d" : "Failed";
+      paymentDetails?.status === "captured" ? "Paid" : "Failed";
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
 
@@ -224,28 +224,32 @@ const RazorPayPremiumVerify = async (req, res) => {
       process.env.Razorpay_webhookSecret
     );
 
+    
+
     if (!validWebhookSignature) {
       return res.status(400).json({ message: "invalid webhook signature" });
     }
 
     const paymentDetails = req.body.payload.payment.entity;
 
+
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
+    console.log(paymentDetails,"paymentDetails");
+    console.log(order,"order")
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
     order.active = paymentDetails?.status === "captured" ? "Paid" : "Failed";
-    order.status = paymentDetails?.status === "captured" ? "Paid" : "Failed";
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
 
     await order.save();
-    const user = await User.findById({ email: paymentDetails?.notes?.email });
-    user.isPremium = true;
-    await user.save();
+    // const user = await User.findById({ _id: userId });
+    // user.isPremium = newSubScription.planType ? true : false;
+    // await user.save();
 
     res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
