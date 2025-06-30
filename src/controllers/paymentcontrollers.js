@@ -239,9 +239,10 @@ const RazorPayPremiumVerify = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    order.active = paymentDetails?.status === "captured" ? "Paid" : "Failed";
+    order.active = paymentDetails?.status === "captured" ? true : false;
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
+    order.status = paymentDetails?.status === "captured" ? "Paid" : "Failed";
 
     await order.save();
     // const user = await User.findById({ _id: userId });
