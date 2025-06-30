@@ -204,21 +204,20 @@ const RazorPayPremiumController = async (req, res) => {
       razorpayDetails: {
         orderId: razorPayResponse.id,
       },
-      notes: razorPayResponse.notes,
       active: false,
     });
 
     await newSubScription.save();
-     res.status(200).json({ message: "payment data", data: razorPayResponse });
+
+    res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
- const RazorPayPremiumVerify = async (req, res) => {
+const RazorPayPremiumVerify = async (req, res) => {
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
-
     const validWebhookSignature = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
@@ -226,51 +225,35 @@ const RazorPayPremiumController = async (req, res) => {
     );
 
     if (!validWebhookSignature) {
-      return res.status(400).json({ message: "Invalid webhook signature" });
+      return res.status(400).json({ message: "invalid webhook signature" });
     }
 
-    const paymentDetails = req.body?.payload?.payment?.entity;
-
-    if (!paymentDetails?.order_id) {
-      return res.status(400).json({ message: "Missing Razorpay order_id" });
-    }
+    const paymentDetails = req.body.payload.payment.entity;
 
     const order = await SubScription.findOne({
-      "razorpayDetails.orderId": paymentDetails.order_id,
+      "razorpayDetails.orderId": paymentDetails?.order_id,
     });
+    console.log(paymentDetails, "paymentDetails");
+    console.log(order, "order");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-
-    // Update subscription details
+    order.active = paymentDetails?.status === "captured" ? "Paid" : "Failed";
+    order.status = paymentDetails?.status === "captured" ? "Paid" : "Failed";
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
 
-    const isPaymentCaptured = paymentDetails.status === "captured";
-
-    order.active = isPaymentCaptured;
-
-    // OPTIONAL: Add status tracking (update schema to include 'status' field if needed)
-    order.status = isPaymentCaptured ? "Paid" : "Failed";
-
     await order.save();
+    // const user = await User.findById({ _id: userId });
+    // user.isPremium = newSubScription.planType ? true : false;
+    // await user.save();
 
-    // Optionally update user premium status
-    // const user = await User.findById(order.user);
-    // if (user) {
-    //   user.isPremium = isPaymentCaptured;
-    //   await user.save();
-    // }
-
-    res.status(200).json({ message: "Webhook received and processed successfully" });
-
+    res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
-    console.error("Webhook error:", error);
-    res.status(400).json({ message: error.message || "Something went wrong" });
+    res.status(400).json({ message: error.message });
   }
 };
-
 module.exports = {
   RazorPayOrderController,
   RazorPayVerify,
