@@ -224,19 +224,17 @@ const RazorPayPremiumVerify = async (req, res) => {
       process.env.Razorpay_webhookSecret
     );
 
-    console.log(req.body)
-
+     console.log(validWebhookSignature,"validWebhookSignature")
     if (!validWebhookSignature) {
       return res.status(400).json({ message: "invalid webhook signature" });
     }
 
     const paymentDetails = req.body.payload.payment.entity;
-
+     console.log(paymentDetails,"paymentDetails")
 
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(paymentDetails,"paymentDetails");
     console.log(order,"order")
 
     if (!order) {
