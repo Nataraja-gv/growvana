@@ -6,7 +6,7 @@ const deactivateExpiredSubscriptions = () => {
   cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
-      console.log("Running cron job at:", now);
+      // console.log("Running cron job at:", now);
       const expired = await SubScription.find({
         endDate: { $lte: now },
         active: true,

@@ -29,6 +29,10 @@ const SubScriptionSchema = new mongoose.Schema(
       paymentId: { type: String }, // razorpay_payment_id
       signature: { type: String }, // razorpay_signature
     },
+    notes: {
+      userName: { type: String },
+      email: { type: String },
+    },
     active: {
       type: Boolean,
       default: true,

@@ -204,12 +204,13 @@ const RazorPayPremiumController = async (req, res) => {
       razorpayDetails: {
         orderId: razorPayResponse.id,
       },
+      notes: razorPayResponse.notes,
       active: false,
     });
 
     await newSubScription.save();
 
-    res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
+    res.status(200).json({ message: "payment data", data: razorPayResponse });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -219,23 +220,24 @@ const RazorPayPremiumVerify = async (req, res) => {
   try {
     const webhookSignature = req.get("X-Razorpay-Signature");
     const validWebhookSignature = validateWebhookSignature(
-      JSON.stringify(req.body),
+      req.body,
       webhookSignature,
       process.env.Razorpay_webhookSecret
     );
 
-     console.log(validWebhookSignature,"validWebhookSignature")
+    console.log(validWebhookSignature, "validWebhookSignature");
     if (!validWebhookSignature) {
       return res.status(400).json({ message: "invalid webhook signature" });
     }
-
-    const paymentDetails = req.body.payload.payment.entity;
-     console.log(paymentDetails,"paymentDetails")
+    const body = JSON.parse(req.body.toString());
+    const paymentDetails = body.payload.payment.entity;
+    // const paymentDetails = req.body.payload.payment.entity;
+    console.log(paymentDetails, "paymentDetails");
 
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(order,"order")
+    console.log(order, "order");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
