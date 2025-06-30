@@ -233,8 +233,6 @@ const RazorPayPremiumVerify = async (req, res) => {
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(paymentDetails, "paymentDetails");
-    console.log(order, "order");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -245,9 +243,9 @@ const RazorPayPremiumVerify = async (req, res) => {
     order.razorpayDetails.signature = webhookSignature;
 
     await order.save();
-    // const user = await User.findById({ _id: userId });
-    // user.isPremium = newSubScription.planType ? true : false;
-    // await user.save();
+    const user = await User.findById({ email: paymentDetails?.notes?.email });
+    user.isPremium = true;
+    await user.save();
 
     res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
