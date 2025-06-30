@@ -125,6 +125,8 @@ const RazorPayVerify = async (req, res) => {
     const order = await orderModel.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
+    console.log(paymentDetails, "paymentDetails_order");
+    console.log(order, "order32456_order");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -233,11 +235,8 @@ const RazorPayPremiumVerify = async (req, res) => {
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(paymentDetails,"pp")
-    console.log(paymentDetails?.order_id, "order_id");
-    console.log( typeof paymentDetails?.order_id, "order_id");
-
-    // console.log(order, "order");
+    console.log(paymentDetails?.order_id, "order_id_pre");
+    console.log(order, "order_pre");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
