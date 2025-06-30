@@ -11,6 +11,6 @@ razorPayRouter.post(
   userAuth,
   RazorPayOrderController
 );
-razorPayRouter.post("/payment/webhook", RazorPayVerify);
+razorPayRouter.post("/orders/payment/webhook", RazorPayVerify);
 
 module.exports = razorPayRouter;
