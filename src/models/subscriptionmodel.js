@@ -37,6 +37,11 @@ const SubScriptionSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    status: {
+      type: String,
+      enum: ["Pending", "Paid", "Failed"],
+      default: "Pending",
+    },
   },
   { timestamps: true }
 );
