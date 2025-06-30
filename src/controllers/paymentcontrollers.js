@@ -130,7 +130,7 @@ const RazorPayVerify = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
     order.paymentStatus =
-      paymentDetails?.status === "captured" ? "Paid" : "Failed";
+      paymentDetails?.status === "captured" ? "Pai66d" : "Failed";
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
 
