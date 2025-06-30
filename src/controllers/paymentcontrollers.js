@@ -125,7 +125,7 @@ const RazorPayVerify = async (req, res) => {
     const order = await orderModel.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-     console.log(paymentDetails, "paymentDetails");
+    console.log(paymentDetails, "paymentDetails");
     console.log(order, "order");
 
     if (!order) {
@@ -235,7 +235,7 @@ const RazorPayPremiumVerify = async (req, res) => {
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(paymentDetails, "paymentDetails");
+    console.log(paymentDetails?.order_id, "paymentDetails?.order_id");
     console.log(order, "order");
 
     if (!order) {
