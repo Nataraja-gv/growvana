@@ -34,8 +34,8 @@ const SubScriptionSchema = new mongoose.Schema(
       email: { type: String },
     },
     active: {
-      type: String,
-      // default: true,
+      type: Boolean,
+      default: false,
     },
     status: {
       type: String,
