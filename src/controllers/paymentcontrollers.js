@@ -209,8 +209,7 @@ const RazorPayPremiumController = async (req, res) => {
     });
 
     await newSubScription.save();
-
-    res.status(200).json({ message: "payment data", data: razorPayResponse });
+     res.status(200).json({ message: "payment data", data: razorPayResponse });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
