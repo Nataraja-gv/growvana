@@ -231,11 +231,11 @@ const RazorPayPremiumVerify = async (req, res) => {
     }
 
     const paymentDetails = req.body.payload.payment.entity;
-
+ console.log(paymentDetails?.order_id, "order_id_pre");
     const order = await SubScription.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
     });
-    console.log(paymentDetails?.order_id, "order_id_pre");
+    
     console.log(order, "order_pre");
 
     if (!order) {
