@@ -245,9 +245,9 @@ const RazorPayPremiumVerify = async (req, res) => {
     order.status = paymentDetails?.status === "captured" ? "Paid" : "Failed";
 
     await order.save();
-    // const user = await User.findById({ _id: userId });
-    // user.isPremium = newSubScription.planType ? true : false;
-    // await user.save();
+    const user = await User.findOne({ email: paymentDetails.notes.email });
+    user.isPremium = paymentDetails?.status === "captured" ? true : false;
+    await user.save();
 
     res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
