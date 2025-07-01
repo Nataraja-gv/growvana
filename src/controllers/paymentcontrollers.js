@@ -69,8 +69,11 @@ const RazorPayOrderController = async (req, res) => {
       return res.status(400).json({ message: "invalid payment method" });
     }
 
+    const userValid = await User.findById({ _id: userId });
+    const deliveryFee = userValid?.isPremium ? 0 : 25;
+    const delivary_free_amount = deliveryFee * 100;
     const options = {
-      amount: totalAmount * 100,
+      amount: totalAmount * 100 + delivary_free_amount,
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
       notes: {
@@ -91,6 +94,9 @@ const RazorPayOrderController = async (req, res) => {
       paymentMethod,
       razorpayDetails: {
         orderId: razorPayResponse.id,
+      },
+      delivary_free: {
+        delivary_amount: deliveryFee,
       },
       notes: razorPayResponse.notes,
     });

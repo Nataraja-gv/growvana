@@ -33,6 +33,12 @@ const orderSchema = new mongoose.Schema(
       enum: ["COD", "Online"],
       required: true,
     },
+    delivary_free: {
+      delivary_amount: {
+        type: Number,
+        default: 0,
+      },
+    },
     paymentStatus: {
       type: String,
       enum: ["Pending", "Paid", "Failed"],
@@ -40,7 +46,13 @@ const orderSchema = new mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      enum: ["Processing", "Shipped", "Delivered", "Cancelled","Out for Delivery"],
+      enum: [
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Out for Delivery",
+      ],
       default: "Processing",
     },
     razorpayDetails: {

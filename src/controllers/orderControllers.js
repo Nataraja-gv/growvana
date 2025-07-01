@@ -8,6 +8,7 @@ const placeTheOrder = async (req, res) => {
   try {
     const userId = req.user._id;
     const userEmail = req.user.email;
+
     const { address, items, paymentMethod } = req.body;
 
     const existAddress = await AddressModel.find({ userId });
@@ -64,6 +65,9 @@ const placeTheOrder = async (req, res) => {
       return res.status(400).json({ message: "invalid payment method" });
     }
 
+    const user = await User.findById({ _id: userId });
+    const deliveryFee = user?.isPremium ? 0 : 25;
+
     const order = new orderModel({
       userId,
       address: selectedAddress,
@@ -73,6 +77,9 @@ const placeTheOrder = async (req, res) => {
       })),
       totalAmount,
       paymentMethod,
+      delivary_free: {
+        delivary_amount: deliveryFee,
+      },
     });
 
     const response = await order.save();
