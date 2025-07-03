@@ -2,6 +2,7 @@ const SubScription = require("../models/subscriptionmodel");
 const User = require("../models/userModel");
 const { SubScription_PLAN_CONFIG } = require("../utils/subscription");
 const cron = require("node-cron");
+const sendSubsciptionEmail = require("./sendSubscription");
 
 const createSubscription = async (req, res) => {
   try {
@@ -57,7 +58,8 @@ const createSubscription = async (req, res) => {
     const user = await User.findById({ _id: userId });
 
     user.isPremium = newSubScription.planType ? true : false;
-    await user.save();
+    await user.save(user?.notes.email, newSubScription);
+    await sendSubsciptionEmail();
     res.status(201).json({
       message: "Subscription created successfully.",
       subscription: newSubScription,

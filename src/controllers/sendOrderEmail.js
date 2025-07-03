@@ -1,7 +1,17 @@
 const nodemailer = require("nodemailer");
+const React = require("react");
+const { renderToBuffer} = require("@react-pdf/renderer");
+const OrderInvoiceDocument = require("../component/inVoicePlaceOrder");
 
-const sendOrderMail = async (toEmail, totalAmount, itemsList) => {
+const sendOrderMail = async (toEmail, totalAmount, itemsList, lastestOrder) => {
   try {
+    const pdfBuffer = await renderToBuffer(
+      React.createElement(OrderInvoiceDocument, {
+        totalAmount,
+        lastestOrder,
+      })
+    );
+     
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -13,7 +23,7 @@ const sendOrderMail = async (toEmail, totalAmount, itemsList) => {
     });
 
     const mailOptions = {
-      from: '"Growvana" <natarajagv369@gmail.com>',
+      from: '"Growvana" <noReplay@gmail.com>',
       to: toEmail,
       subject: "Your Growvana Order Confirmation",
       html: `
@@ -29,6 +39,13 @@ const sendOrderMail = async (toEmail, totalAmount, itemsList) => {
           <p style="font-size: 14px; color: #888;">Need help? Contact support@growvana.com</p>
         </div>
       `,
+      attachments: [
+        {
+          filename: "orderinvoice.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        },
+      ],
     };
 
     await transporter.sendMail(mailOptions);
