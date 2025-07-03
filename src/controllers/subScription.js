@@ -58,8 +58,8 @@ const createSubscription = async (req, res) => {
     const user = await User.findById({ _id: userId });
 
     user.isPremium = newSubScription.planType ? true : false;
-    await user.save(user?.notes.email, newSubScription);
-    await sendSubsciptionEmail();
+    await user.save();
+    await sendSubsciptionEmail(user?.notes.email, newSubScription);
     res.status(201).json({
       message: "Subscription created successfully.",
       subscription: newSubScription,

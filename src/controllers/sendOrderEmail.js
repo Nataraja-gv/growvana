@@ -12,6 +12,7 @@ const sendOrderMail = async (toEmail, totalAmount, itemsList, lastestOrder) => {
       })
     );
      
+    
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
