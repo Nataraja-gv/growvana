@@ -3,14 +3,12 @@ const React = require("react");
 const { renderToBuffer } = require("@react-pdf/renderer");
 const SubsriptionInVoice = require("../component/subsciptioninvoice");
 
-const sendSubsciptionEmail = async (toEmail,subsciptionData) => {
-  
+const sendSubsciptionEmail = async (toEmail, subsciptionData) => {
   try {
-    console.log("email email")
     const pdfBuffer = await renderToBuffer(
       React.createElement(SubsriptionInVoice, { subsciptionData })
     );
-    const transporter = nodemailer.transporter({
+    const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
@@ -81,7 +79,7 @@ const sendSubsciptionEmail = async (toEmail,subsciptionData) => {
 
       attachments: [
         {
-          filename: "orderinvoice.pdf",
+          filename: "subscription_invoice.pdf",
           content: pdfBuffer,
           contentType: "application/pdf",
         },
