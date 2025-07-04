@@ -253,8 +253,8 @@ const RazorPayPremiumVerify = async (req, res) => {
     const user = await User.findOne({ email: paymentDetails.notes.email });
     user.isPremium = paymentDetails?.status === "captured" ? true : false;
     await user.save();
-     console.log(order?.notes.email,"order?.notes.email")
-     console.log(order,"order")
+    //  console.log(order?.notes.email,"order?.notes.email")
+    //  console.log(order,"order")
      await sendSubsciptionEmail(order?.notes.email, order);
 
     res.status(200).json({ message: "webhook received successfully" });

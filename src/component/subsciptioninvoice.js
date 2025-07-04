@@ -109,7 +109,7 @@ const SubsriptionInVoice = ({ subsciptionData }) => {
         React.createElement(
           Text,
           { style: styles.text },
-          `Plan Amount: ₹${planDetails.PlanAmount}`
+          `Plan Amount: Rs.${planDetails.PlanAmount}`
         ),
         React.createElement(
           Text,

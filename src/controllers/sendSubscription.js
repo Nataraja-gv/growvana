@@ -8,6 +8,12 @@ const sendSubsciptionEmail = async (toEmail, subsciptionData) => {
     const pdfBuffer = await renderToBuffer(
       React.createElement(SubsriptionInVoice, { subsciptionData })
     );
+    const formatDate = (dateStr) =>
+      new Date(dateStr).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -51,15 +57,15 @@ const sendSubsciptionEmail = async (toEmail, subsciptionData) => {
       </tr>
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;"><strong>Start Date</strong></td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${new Date(
+        <td style="padding: 8px; border: 1px solid #ddd;"> ${formatDate(
           subsciptionData.startDate
-        ).toLocaleDateString()}</td>
+        )} </td>
       </tr>
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;"><strong>End Date</strong></td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${new Date(
+        <td style="padding: 8px; border: 1px solid #ddd;">${formatDate(
           subsciptionData.endDate
-        ).toLocaleDateString()}</td>
+        )}</td>
       </tr>
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;"><strong>Status</strong></td>
