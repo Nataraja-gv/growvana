@@ -110,6 +110,7 @@ const RazorPayOrderController = async (req, res) => {
      console.log("order created one")
 
     res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
+    console.log("two trwonsqhwdvs")
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
