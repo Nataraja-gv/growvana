@@ -1,19 +1,17 @@
 const nodemailer = require("nodemailer");
 const React = require("react");
-const { renderToBuffer} = require("@react-pdf/renderer");
+const { renderToBuffer } = require("@react-pdf/renderer");
 const OrderInvoiceDocument = require("../component/inVoicePlaceOrder");
 
 const sendOrderMail = async (toEmail, totalAmount, itemsList, lastestOrder) => {
   try {
-    console.log("ghdggh")
     const pdfBuffer = await renderToBuffer(
       React.createElement(OrderInvoiceDocument, {
         totalAmount,
         lastestOrder,
       })
     );
-     
-    
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,

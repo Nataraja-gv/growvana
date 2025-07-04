@@ -107,10 +107,10 @@ const RazorPayOrderController = async (req, res) => {
 
     clearOrders.cartItems = [];
     await clearOrders.save();
-     console.log("order created one")
+    console.log("order created one");
 
     res.status(200).json({ message: "paymwnt data", data: razorPayResponse });
-    console.log("two trwonsqhwdvs")
+    console.log("two trwonsqhwdvs");
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -118,7 +118,6 @@ const RazorPayOrderController = async (req, res) => {
 
 const RazorPayVerify = async (req, res) => {
   try {
-    console.log("order orde webhook two")
     const webhookSignature = req.get("X-Razorpay-Signature");
     const validWebhookSignature = validateWebhookSignature(
       JSON.stringify(req.body),
@@ -133,26 +132,18 @@ const RazorPayVerify = async (req, res) => {
 
     const order = await orderModel.findOne({
       "razorpayDetails.orderId": paymentDetails?.order_id,
-    });
+    }).populate("items.product")
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-     console.log("order created  two")
 
     order.paymentStatus =
-    paymentDetails?.status === "captured" ? "Paid" : "Failed";
+      paymentDetails?.status === "captured" ? "Paid" : "Failed";
     order.razorpayDetails.paymentId = paymentDetails.id;
     order.razorpayDetails.signature = webhookSignature;
-     console.log("order created  three")
-  
+
     await order.save();
-    console.log( order.notes.email,
-      order.totalAmount,
-      order.items?.length,
-      order,"123456789");
-     console.log("order created 4")
-      
 
     await sendOrderMail(
       order.notes.email,
@@ -160,8 +151,6 @@ const RazorPayVerify = async (req, res) => {
       order.items?.length,
       order
     );
-
-     console.log("console 5")
 
     res.status(200).json({ message: "webhook received successfully" });
   } catch (error) {
