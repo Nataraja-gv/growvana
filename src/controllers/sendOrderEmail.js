@@ -5,6 +5,7 @@ const OrderInvoiceDocument = require("../component/inVoicePlaceOrder");
 
 const sendOrderMail = async (toEmail, totalAmount, itemsList, lastestOrder) => {
   try {
+    console.log("ghdggh")
     const pdfBuffer = await renderToBuffer(
       React.createElement(OrderInvoiceDocument, {
         totalAmount,
