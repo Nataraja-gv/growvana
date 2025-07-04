@@ -141,7 +141,8 @@ const RazorPayVerify = async (req, res) => {
     order.razorpayDetails.signature = webhookSignature;
 
     await order.save();
-     await sendOrderMail(order.notes.email, order.totalAmount, order.items?.length,order);
+     console.log("123456789")
+    await sendOrderMail(order.notes.email, order.totalAmount, order.items?.length,order);
 
 
     res.status(200).json({ message: "webhook received successfully" });
