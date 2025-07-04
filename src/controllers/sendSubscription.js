@@ -4,6 +4,7 @@ const { renderToBuffer } = require("@react-pdf/renderer");
 const SubsriptionInVoice = require("../component/subsciptioninvoice");
 
 const sendSubsciptionEmail = async (toEmail,subsciptionData) => {
+  
   try {
     console.log("email email")
     const pdfBuffer = await renderToBuffer(
