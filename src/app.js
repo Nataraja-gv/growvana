@@ -17,8 +17,7 @@ const addressRouter = require("./routers/addressRouter");
 const orderRouter = require("./routers/orderRouter");
 const razorPayRouter = require("./routers/razorRouter");
 const SubscriptionRouter = require("./routers/subScriptionRouter");
- 
- 
+const DashboardRouter = require("./routers/dashboardRouter");
 
 const app = express();
 app.use(express.json());
@@ -40,6 +39,8 @@ app.use("/", addressRouter);
 app.use("/", orderRouter);
 app.use("/", razorPayRouter);
 app.use("/", SubscriptionRouter);
+app.use("/", DashboardRouter);
+
 
 const startServer = async () => {
   try {
