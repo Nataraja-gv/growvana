@@ -3,6 +3,7 @@ const orderModel = require("../models/orderSchema");
 const Product = require("../models/productModel");
 const SubScription = require("../models/subscriptionmodel");
 const User = require("../models/userModel");
+const { sendMonthlyInvoice } = require("./sendOrderEmail");
 
 const dashBoardDetails = async (req, res) => {
   try {
@@ -186,4 +187,63 @@ const dashBoardDetails = async (req, res) => {
   }
 };
 
-module.exports = { dashBoardDetails };
+const dashboardInvoiceDetails = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const orderStartDate = startDate
+      ? new Date(startDate)
+      : new Date("1970-01-01");
+    const orderEndDate = endDate ? new Date(endDate) : new Date();
+    const orders = await orderModel
+      .find({
+        createdAt: {
+          $gte: orderStartDate,
+          $lte: orderEndDate,
+        },
+      })
+      .populate("userId", "name email")
+      .populate("items.product");
+
+    res.status(200).json({
+      message: "Invoice Details",
+      data: orders,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const dashboardSendInvoiceDetails = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const orderStartDate = startDate
+      ? new Date(startDate)
+      : new Date("1970-01-01");
+    const orderEndDate = endDate ? new Date(endDate) : new Date();
+    const orders = await orderModel
+      .find({
+        createdAt: {
+          $gte: orderStartDate,
+          $lte: orderEndDate,
+        },
+      })
+      .populate("userId", "name email")
+      .populate("items.product");
+    // Logic to send invoice details via email would go here
+
+    await sendMonthlyInvoice(orders);
+
+    res.status(200).json({
+      message: "Invoice Details sent to email",
+      // data: orders,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  dashBoardDetails,
+  dashboardInvoiceDetails,
+  dashboardSendInvoiceDetails,
+};

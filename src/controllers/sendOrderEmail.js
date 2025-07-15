@@ -2,6 +2,52 @@ const nodemailer = require("nodemailer");
 const React = require("react");
 const { renderToBuffer } = require("@react-pdf/renderer");
 const OrderInvoiceDocument = require("../component/inVoicePlaceOrder");
+const OrderMonthlyInvoiceDocument = require("../component/OrderMonthlyInvoiceDocument");
+
+const sendMonthlyInvoice = async (invoiceData) => {
+  try {
+    const pdfBuffer = await renderToBuffer(
+      React.createElement(OrderMonthlyInvoiceDocument, {
+        invoiceData,
+      })
+    );
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "natarajagv369@gmail.com",
+        pass: "rgdy anma umhf mjxg",
+      },
+    });
+
+    const mailOptions = {
+      from: '"Growvana" <noReplay@gmail.com>',
+      to: "nataraja2k00@gmail.com",
+      subject: "Your Monthly Invoice from Growvana",
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
+          <h2 style="color:rgb(46, 193, 85);">📅 Your Monthly Invoice</h2>
+          <p>Dear Admin,</p>
+          <p>Thank you for being a valued customer. Please find your monthly invoice attached.</p>
+          <p>If you have any questions, feel free to reach out to our support team.</p>
+          <br />
+          <p style="font-size: 14px; color: #888;">Best Regards,<br />The Growvana Team</p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: "monthlyOrderinvoices.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        },
+      ],
+    };
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
 const sendOrderMail = async (toEmail, totalAmount, itemsList, lastestOrder) => {
   try {
@@ -99,4 +145,4 @@ const sendOrderStatusEmail = async (toEmail, orderStatus) => {
   }
 };
 
-module.exports = { sendOrderMail, sendOrderStatusEmail };
+module.exports = { sendOrderMail, sendOrderStatusEmail, sendMonthlyInvoice };
