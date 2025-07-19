@@ -1,6 +1,8 @@
 const express = require("express");
 const userAuth = require("../middleware/userauth");
-const AdminAuth = require("../middleware/adminAuth");
+ const AdminAuth = require("../middleware/adminAuth.js")
+ 
+ 
 const {
   RazorPayOrderController,
   RazorPayVerify,
