@@ -3,6 +3,7 @@ const orderModel = require("../models/orderSchema");
 const Product = require("../models/productModel");
 const SubScription = require("../models/subscriptionmodel");
 const User = require("../models/userModel");
+const { generateCryptoInvoiceId } = require("../utils/uniqueid");
 const { sendMonthlyInvoice } = require("./sendOrderEmail");
 
 const dashBoardDetails = async (req, res) => {
@@ -230,8 +231,11 @@ const dashboardSendInvoiceDetails = async (req, res) => {
       .populate("userId", "name email")
       .populate("items.product");
     // Logic to send invoice details via email would go here
+    const uniqueInvoiceid = generateCryptoInvoiceId();
+     
 
-    await sendMonthlyInvoice(orders);
+    await sendMonthlyInvoice(orders , uniqueInvoiceid);
+    
 
     res.status(200).json({
       message: "Invoice Details sent to email",

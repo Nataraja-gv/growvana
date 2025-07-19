@@ -4,7 +4,7 @@ const { renderToBuffer } = require("@react-pdf/renderer");
 const OrderInvoiceDocument = require("../component/inVoicePlaceOrder");
 const OrderMonthlyInvoiceDocument = require("../component/OrderMonthlyInvoiceDocument");
 
-const sendMonthlyInvoice = async (invoiceData) => {
+const sendMonthlyInvoice = async (invoiceData, uniqueInvoiceid) => {
   try {
     const pdfBuffer = await renderToBuffer(
       React.createElement(OrderMonthlyInvoiceDocument, {
@@ -37,7 +37,7 @@ const sendMonthlyInvoice = async (invoiceData) => {
       `,
       attachments: [
         {
-          filename: "monthlyOrderinvoices.pdf",
+          filename: `${uniqueInvoiceid}.pdf`,
           content: pdfBuffer,
           contentType: "application/pdf",
         },

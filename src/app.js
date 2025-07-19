@@ -4,7 +4,6 @@ require("./controllers/dailyPromoEmail");
 const deactivateExpiredSubscriptions = require("./utils/deactivateExpiredSubscriptions");
 deactivateExpiredSubscriptions();
 const cors = require("cors");
-
 const ConnectDB = require("./config/database");
 const categoryRouter = require("./routers/categoryRouter");
 const adminRouter = require("./routers/adminRouter");
@@ -18,6 +17,9 @@ const orderRouter = require("./routers/orderRouter");
 const razorPayRouter = require("./routers/razorRouter");
 const SubscriptionRouter = require("./routers/subScriptionRouter");
 const DashboardRouter = require("./routers/dashboardRouter");
+const http = require("http");
+const createSocket = require("./utils/createSocket");
+const chatRouter = require("./routers/chatRouter");
 
 const app = express();
 app.use(express.json());
@@ -40,14 +42,18 @@ app.use("/", orderRouter);
 app.use("/", razorPayRouter);
 app.use("/", SubscriptionRouter);
 app.use("/", DashboardRouter);
+app.use("/", chatRouter);
 
+
+const server = http.createServer(app);
+createSocket(server);
 
 const startServer = async () => {
   try {
     await ConnectDB();
     console.log("✅ Database connected successfully");
 
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log(`🚀 Server running on http://localhost:${process.env.PORT}`);
     });
   } catch (error) {
